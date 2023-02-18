@@ -332,6 +332,7 @@ encode(#{encoder := Encoder,
     %% RequestData = Encoder:encode_msg(Map, MsgType),
     try Encoder:encode_msg(Map, MsgType) of
         RequestData ->
+            erlang:display({hedley_grpc_stream, RequestData, CompressionMethod}),
             maybe_compress(RequestData, CompressionMethod)
     catch
         error:function_clause ->
