@@ -255,10 +255,13 @@ send_msg(#{stream_id := StreamId,
            state := State
           } = Stream, Message, EndStream) ->
     Encoded = encode(Stream, Message),
+    erlang:display({hedley_send_msg, Message, Encoded, HeadersSent}),
     case HeadersSent of
         false ->
             DefaultHeaders = default_headers(Stream),
+            erlang:display({hedley_send_msg, "DefaultHeaders", DefaultHeaders}),
             AllHeaders = add_metadata(DefaultHeaders, Metadata),
+            erlang:display({hedley_send_msg, "AllHeaders", AllHeaders}),
             ok = grpc_client_connection:send_headers(Connection, StreamId, AllHeaders);
         true ->
             ok
@@ -333,7 +336,9 @@ encode(#{encoder := Encoder,
     try Encoder:encode_msg(Map, MsgType) of
         RequestData ->
             erlang:display({hedley_grpc_stream, RequestData, CompressionMethod}),
-            maybe_compress(RequestData, CompressionMethod)
+            Rsp = maybe_compress(RequestData, CompressionMethod),
+            erlang:display({hedley_grpc_stream2, Rsp}),
+            Rsp
     catch
         error:function_clause ->
           throw({error, {failed_to_encode, MsgType, Map}});

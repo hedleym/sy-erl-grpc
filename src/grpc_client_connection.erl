@@ -87,6 +87,7 @@ send_headers(#{http_connection := Pid,
 send_body(#{http_connection := Pid,
             client := Client}, StreamId, Body, Opts) ->
     try
+        erlang:display({hedley_send_body, Body, Client, Opts}),
         Client:send_data(Pid, StreamId, Body, Opts)
     catch
         _:_ ->
